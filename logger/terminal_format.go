@@ -200,7 +200,13 @@ func escapeString(s string) string {
 // JsonFormatEx formats log records as JSON objects. If pretty is true,
 // records will be pretty-printed. If lineSeparated is true, records
 // will be logged with a new line between each record.
-func JsonFormatEx(pretty, lineSeparated bool) LogFormat {
+func JsonFormatEx(options *LogOptions) LogFormat {
+	pretty := options.GetBoolDefault("pretty", false)
+	lineSeparated := options.GetBoolDefault("lineSeparated", true)
+	timeKey := options.GetStringDefault("timekey", "t")
+	levelKey := options.GetStringDefault("levelkey", "lvl")
+	messageKey := options.GetStringDefault("messagekey", "msg")
+
 	jsonMarshal := json.Marshal
 	if pretty {
 		jsonMarshal = func(v interface{}) ([]byte, error) {
@@ -211,9 +217,9 @@ func JsonFormatEx(pretty, lineSeparated bool) LogFormat {
 	return FormatFunc(func(r *Record) []byte {
 		props := make(map[string]interface{})
 
-		props["t"] = r.Time
-		props["lvl"] = levelString[r.Level]
-		props["msg"] = r.Message
+		props[timeKey] = r.Time
+		props[levelKey] = levelString[r.Level]
+		props[messageKey] = r.Message
 		for k, v := range r.Context {
 			props[k] = formatJsonValue(v)
 		}

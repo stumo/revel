@@ -92,8 +92,7 @@ func (h *CompositeMultiHandler) SetHandlers(handler LogHandler, options *LogOpti
 }
 func (h *CompositeMultiHandler) SetJson(writer io.Writer, options *LogOptions) {
 	handler := CallerFileHandler(StreamHandler(writer, JsonFormatEx(
-		options.GetBoolDefault("pretty", false),
-		options.GetBoolDefault("lineSeparated", true),
+		options,
 	)))
 	if options.HandlerWrap != nil {
 		handler = options.HandlerWrap.SetChild(handler)
